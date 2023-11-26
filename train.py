@@ -59,9 +59,14 @@ def main():
     trainer = Trainer(model=model, data_mgr=data_mgr, optimizer=optimizer, criterion=criterion,
                       SAVE_FILE=SAVE_FILE, BATCH_SIZE=BATCH_SIZE, name=args.name)
     trainer.train(epochs=EPOCHS)
-    loss, mae, rmse = trainer.report_test_error()
-    outdf = pd.DataFrame({'MAE': mae, 'RMSE': rmse}, index=[*range(1, 13)])
-    outdf.to_csv('outputs/'+SAVE_FILE+'_metrics.csv')
+    loss, mae, rmse, avg_percentage_diff = trainer.report_test_error()
+
+    # Saving additional metrics
+    with open('outputs/' + SAVE_FILE + '_metrics.txt', 'w') as f:
+        f.write(f'Test Loss: {loss}\n')
+        f.write(f'Test MAE: {mae}\n')
+        f.write(f'Test RMSE: {rmse}\n')
+        f.write(f'Average Percentage Difference: {avg_percentage_diff}%\n')
 
 
 if __name__ == '__main__':

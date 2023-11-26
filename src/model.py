@@ -26,6 +26,8 @@ class Encoder(nn.Module):
         self.GRU_LSTM = GRU_LSTM
         self.is_bidirectional = is_bidirectional
 
+        self.dropout = nn.Dropout(p = 0.5)
+
         self.embedding_layer = embedding_layer
         if embedding_layer is not None:
             embd_dim = embedding_layer.embd_dim
@@ -60,6 +62,8 @@ class Encoder(nn.Module):
                 batch_ids).unsqueeze(0).repeat(enc_len, 1, 1)
             rnn_input = torch.cat((rnn_input, pts_embedded), dim=2)
 
+        rnn_input = self.dropout(rnn_input) #apply dropout
+
         if self.GRU_LSTM == 'GRU':
             outputs, hidden = self.rnn(rnn_input)
         elif self.GRU_LSTM == 'LSTM':
@@ -92,9 +96,11 @@ class Decoder(nn.Module):
         self.dec_input_dim = dec_input_dim + embd_dim
         if GRU_LSTM == 'GRU':
             self.rnn = nn.GRU(self.dec_input_dim, dec_dim)
-        if GRU_LSTM == 'LSTM':
+        elif GRU_LSTM == 'LSTM':
             self.rnn = nn.LSTM(self.dec_input_dim, dec_dim)
         self.fc = nn.Linear(dec_dim, 1)
+
+        self.dropout = nn.Dropout(p=0.5)  # Monte Carlo Dropout
 
         if self.attention_ind:
             self.attn = nn.Linear(self.dec_input_dim + dec_dim, enc_len)
@@ -125,6 +131,8 @@ class Decoder(nn.Module):
             if self.embedding_layer is not None:
                 pts_embedded = self.embedding_layer(batch_ids).unsqueeze(0)
                 rnn_input = torch.cat((rnn_input, pts_embedded), dim=2)
+
+            rnn_input = self.dropout(rnn_input)  # Apply dropout
 
             if self.attention_ind:
                 attn_weights = F.softmax(

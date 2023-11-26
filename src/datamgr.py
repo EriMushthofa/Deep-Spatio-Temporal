@@ -87,7 +87,6 @@ class CRSData:
 
 class DataMgr(CRSData):
     def __init__(self, file_path="../../data/Wind Spatio-Temporal Dataset2.csv",
-                 train_len=60*24, val_len=30*24, time_len=365*24,
                  ENC_LEN=48, DEC_LEN=12, K=5, similarity='spatio'):
 
         super().__init__(file_path=file_path, K=K)
@@ -125,16 +124,18 @@ class DataMgr(CRSData):
         self.data = torch.cat(
             (self.data, self.power_tensor, self.time_features, self.spatio_tensor), dim=2)
 
-        self.train_len = train_len
-        self.time_len = time_len
+        total_data_len = self.data.size(1)
+        self.train_len = int(total_data_len * 0.05)  # 5% for training
+        self.val_len = int(total_data_len * 0.05)    # 5% for validation
+        self.test_len = total_data_len - self.train_len - self.val_len
+
+        self.train_data = self.data[:, :self.train_len, :]
+        self.val_data = self.data[:, self.train_len:(self.train_len + self.val_len), :]
+        self.test_data = self.data[:, (self.train_len + self.val_len):, :]
 
         self.enc_len = ENC_LEN
         self.dec_len = DEC_LEN
         self.total_len = ENC_LEN + DEC_LEN
-
-        self.train_data = self.data[:, :train_len, :]
-        self.val_data = self.data[:, train_len:(train_len+val_len), :]
-        self.test_data = self.data[:, (train_len+val_len):, :]
 
 
 class wpDataset(Dataset):
