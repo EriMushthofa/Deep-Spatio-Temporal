@@ -177,8 +177,13 @@ class Trainer:
         total_percentage_diff = 0
         total_count = 0
 
+        all_y_true = []
+        all_y_pred = []
+
+
         prog_bar = tqdm(enumerate(self.test_dataloader), total=int(
             len(self.test_dataset)/self.test_dataloader.batch_size))
+
         with torch.no_grad():
             for i, data in prog_bar:
                 counter += 1
@@ -200,6 +205,9 @@ class Trainer:
                 y_true, mean_prediction = self.rescale_output(y_true, mean_prediction)
                 idx = ~torch.isnan(y_true)
 
+                all_y_true.append(y_true)
+                all_y_pred.append(mean_prediction)
+
                 loss = self.criterion(mean_prediction[idx], y_true[idx])
                 running_loss += loss.item()
 
@@ -212,6 +220,8 @@ class Trainer:
                 total_percentage_diff += valid_percentage_diff.sum()
                 total_count += valid_percentage_diff.numel()
 
+        y_true_concat = torch.cat(all_y_true, dim=0)
+        y_pred_concat = torch.cat(all_y_pred, dim=0)
         test_loss = running_loss/counter
         test_mae = [x / counter for x in running_mae]
         test_rmse = [x / counter for x in running_rmse]
@@ -224,7 +234,7 @@ class Trainer:
 
 
 
-        return test_loss, test_mae, test_rmse, average_percentage_diff
+        return test_loss, test_mae, test_rmse, average_percentage_diff, y_true_concat, y_pred_concat
 
     def rescale_output(self, y_true, y_pred):
         for i in range(12):
