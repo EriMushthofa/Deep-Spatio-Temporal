@@ -8,5 +8,3 @@ This dataset is from https://aml.engr.tamu.edu/book-dswe/dswe-datasets/. The dat
 python train.py --name wind_power --epoch 300 --batch_size 20000 --lr 0.001 --k 5 --n_turbines 200
 ```
 
-## References
-* Jiangyuan Li, Mohammadreza Armandpour. (2022) "Deep Spatio-Temporal Wind Power Forecasting". IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP).
