@@ -106,9 +106,7 @@ def main():
         y_true_np = y_true_concat.numpy()
         y_pred_np = y_pred_concat.numpy()
 
-        # Calculate MAPE and MASE for this fold
-        mape = calculate_mape(y_true_np, y_pred_np)
-        mase = calculate_mase(y_true_np, y_pred_np, y_train_np)
+        
 
         # Store metrics for this fold
         all_metrics['train_mae'].append(np.mean(train_mae))
@@ -117,8 +115,7 @@ def main():
         all_metrics['train_rmse'].append(np.mean(train_rmse))
         all_metrics['val_rmse'].append(np.mean(val_rmse))
         all_metrics['test_rmse'].append(np.mean(rmse))
-        all_metrics['mape'].append(mape)
-        all_metrics['mase'].append(mase)
+        
 
         # Plotting the forecast
         plot_forecast(y_true_np[0], y_pred_np[0], title=f'Fold {fold+1} Forecast vs Actuals')
