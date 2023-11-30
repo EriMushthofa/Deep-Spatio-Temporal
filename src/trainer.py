@@ -90,6 +90,8 @@ class Trainer:
                 break
         else:
             torch.save(self.model.state_dict(), 'outputs/'+self.SAVE_FILE+'.pt')
+        return train_loss, train_mae, train_rmse
+
 
     def fit(self):
         print('Training')

@@ -98,6 +98,10 @@ def main():
         # Training and validation
         trainer = Trainer(model, data_mgr, optimizer, criterion, SAVE_FILE, BATCH_SIZE, ENC_LEN=48, DEC_LEN=12, name=args.name)
         trainer.train(epochs=EPOCHS)
+        train_loss, train_mae, train_rmse = trainer.fit()
+        val_loss, val_mae, val_rmse = trainer.validate()
+        test_lost, test_mae, test_rmse, average_percentage_diff, y_true_concat, y_pred_concat = trainer.report_test_error()
+
 
         # Evaluate the model on the test set
         y_train = [data[2][:, 1:, 0].numpy() for data in trainer.train_dataloader]
